@@ -5,9 +5,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract HackToken is ERC721 {
     constructor(string memory _name, string memory _symbol)
         ERC721(_name, _symbol)
-    {}
+    {
+        _owner = msg.sender;
+    }
 
-    address _owner = msg.sender;
+    address _owner;
     uint256 _supply;
     uint256 public _numTokens = 0;
 

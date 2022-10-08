@@ -22,6 +22,10 @@ contract TokenMarket {
         listPrice[id] = price;
     }
 
+    function changePrice(uint256 id, uint256 price) public preOwnerOnly(id) {
+        listPrice[id] = price;
+    }
+
     function unlist(uint256 id) public preOwnerOnly(id) {
         listPrice[id] = 0;
     }
