@@ -31,15 +31,15 @@ contract TokenMarket {
     }
 
     function transferBack(uint256 id) public preOwnerOnly(id) {
-        address preOwner = address(uint160(tokenContract.getPrevOwner(id)));
+        address preOwner = tokenContract.getPrevOwner(id);
         tokenContract.transferFrom(address(this), preOwner, id);
     }
 
     function buyToken(uint256 id) public payable {
         require(listPrice[id] != 0, "Invalid token id");
-        require(msg.value >= listPrice[id]);
+        require(msg.value >= listPrice[id], "Not Enough Value to Buy");
 
-        address recipient = address(uint160(tokenContract.getPrevOwner(id)));
+        address recipient = tokenContract.getPrevOwner(id);
         payable(recipient).transfer(msg.value);
         tokenContract.transferFrom(address(this), msg.sender, id);
     }
