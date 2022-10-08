@@ -36,11 +36,27 @@ contract TokenMarket {
     }
 
     function buyToken(uint256 id) public payable {
-        require(listPrice[id] != 0, "Invalid id");
+        require(listPrice[id] != 0, "Invalid token id");
         require(msg.value >= listPrice[id]);
 
         address recipient = address(uint160(tokenContract.getPrevOwner(id)));
         payable(recipient).transfer(msg.value);
         tokenContract.transferFrom(address(this), msg.sender, id);
+    }
+
+    function getPrice(uint256 id) public view returns (uint256) {
+        return listPrice[id];
+    }
+
+    function getInfo(uint256 id) public view returns (string memory) {
+        return tokenContract.getInfo(id);
+    }
+
+    function getUnit(uint256 id) public view returns (string memory) {
+        return tokenContract.getUnit(id);
+    }
+
+    function getQuota(uint256 id) public view returns (uint256) {
+        return tokenContract.getQuota(id);
     }
 }

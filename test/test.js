@@ -14,9 +14,10 @@ contract('TokenMarket', function (accounts) {
 
     it("Only admin can Mint", async () => {
         await truffleAssert.reverts(
-            hackTokenInstance.mint(accounts[1], "1234321312", "CO2", "Singapore East", {
-                from: accounts[3],
-            }),
+            hackTokenInstance.mint(accounts[1], "1234321312", "CO2", "Singapore East", "ton", 100,
+                {
+                    from: accounts[3],
+                }),
             "Admin only function"
         );
     });
@@ -26,41 +27,109 @@ contract('TokenMarket', function (accounts) {
             accounts[1],
             "12345678",
             "C02",
-            "Sinagore West", {
-            from: accounts[0],
-        }
+            "Sinagore West",
+            "ton",
+            100,
+            {
+                from: accounts[0],
+            }
         );
 
         const minted_token_2 = await hackTokenInstance.mint(
             accounts[2],
-            "12345999",
+            "12345678",
             "C02",
-            "Sinagore West", {
-            from: accounts[0],
-        }
+            "Sinagore West",
+            "ton",
+            100,
+            {
+                from: accounts[0],
+            }
         );
-
-        const totalSupply = await hackTokenInstance.getSupply();
-        assert.equal(totalSupply, 2);
     });
 
-    // it("Transfer ownership of tokenn", async () => {
-    //     let transfer_1 = await hackTokenInstance.transferFrom(
-    //         accounts[1],
-    //         accounts[2],
-    //         0,
-    //         { from: accounts[1] }
-    //     ); // valid token id
+    it("Check token unit", async () => {
+        let unit = await tokenMarketInstance.getUnit(1);
 
-    //     let transfer_2 = await hackTokenInstance.transferFrom(
-    //         accounts[3],
-    //         accounts[4],
-    //         2,
-    //         { from: accounts[3] }
-    //     ); // invalid token id
+        assert.notStrictEqual(
+            unit,
+            undefined,
+            "Failed to check unit"
+        );
+    })
 
-    //     truffleAssert.eventEmitted(transfer_1, "transferEvent");
-    //     assert.equal(await hackTokenInstance.ownerOf(0), accounts[2]);
-    //     assert.equal(await hackTokenInstance.ownerOf(2), accounts[4]);
-    // });
+    it("Transfer ownership of tokenn", async () => {
+        let transfer_1 = await hackTokenInstance.transferFrom(
+            accounts[1],
+            accounts[2],
+            0,
+            { from: accounts[1] }
+        );
+
+        truffleAssert.eventEmitted(transfer_1, "transferEvent");
+    });
+
+    it("Transfer to Market", async () => {
+        const minted_token_2 = await hackTokenInstance.mint(
+            accounts[1],
+            "12345678",
+            "C02",
+            "Sinagore West",
+            "ton",
+            100,
+            {
+                from: accounts[0],
+            }
+        );
+
+        await truffleAssert.passes(
+            hackTokenInstance.transferFrom(accounts[1], tokenMarketInstance.address, 2, { from: accounts[1] })
+        );
+    });
+
+    it('List the token', async () => {
+        await truffleAssert.passes(
+            tokenMarketInstance.list(2, '1000000000000000000', { from: accounts[1] })
+        );
+    });
+
+    it("Check Unit in market", async () => {
+        let unit = await tokenMarketInstance.getUnit(2);
+
+        assert.notStrictEqual(
+            unit,
+            undefined,
+            "Failed to check unit"
+        );
+    })
+
+    it('Change the list price of Token', async () => {
+        await truffleAssert.passes(
+            tokenMarketInstance.changePrice(2, '2000000000000000000', { from: accounts[1] })
+        );
+    });
+
+    it('Unlist the token', async () => {
+        await truffleAssert.passes(
+            tokenMarketInstance.unlist(2, { from: accounts[1] })
+        );
+    });
+
+    it('Check Market Price', async () => {
+        tokenMarketInstance.list(2, '1000000000000000000', { from: accounts[1] })
+        let price = await tokenMarketInstance.getPrice(2);
+
+        assert.notStrictEqual(
+            price,
+            undefined,
+            "Failed to check price"
+        );
+    });
+
+    it("Buy token", async () => {
+        await truffleAssert.passes(
+            tokenMarketInstance.buyToken(2, { from: accounts[2], value: 1000000000000000000 })
+        );
+    })
+
 });

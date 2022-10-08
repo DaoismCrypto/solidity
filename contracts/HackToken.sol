@@ -10,10 +10,11 @@ contract HackToken is ERC721 {
     }
 
     address _owner;
-    uint256 _supply;
     uint256 public _numTokens = 0;
+    uint256 _totalSupply;
 
     mapping(uint256 => Token) tokens;
+    mapping(string => uint256) supply;
 
     event mintToken(address _to, string _serNumber, uint256 _tokenId);
     event transferEvent(address _from, address _to, uint256 _tokenId);
@@ -22,6 +23,8 @@ contract HackToken is ERC721 {
         string serialNumber;
         string name;
         string information;
+        string unit;
+        uint256 quota;
         uint256 time;
         address prevOwner;
     }
@@ -43,7 +46,9 @@ contract HackToken is ERC721 {
         address _to,
         string memory _serialNumber,
         string memory _name,
-        string memory _information
+        string memory _information,
+        string memory _unit,
+        uint256 _quota
     ) public adminOnly {
         uint256 _newTokenId = _numTokens++;
         super._mint(_to, _newTokenId);
@@ -52,12 +57,14 @@ contract HackToken is ERC721 {
             _serialNumber,
             _name,
             _information,
+            _unit,
+            _quota,
             block.timestamp,
             address(0)
         );
-        _supply = _supply + 1;
+        supply[_unit] += _quota;
         tokens[_newTokenId] = newToken;
-        emit mintToken(_to, _serialNumber, _supply);
+        emit mintToken(_to, _serialNumber, _quota);
     }
 
     function transferFrom(
@@ -74,7 +81,19 @@ contract HackToken is ERC721 {
         return tokens[_tokenId].prevOwner;
     }
 
-    function getSupply() public view adminOnly returns (uint256) {
-        return _supply;
+    function getSupply(string memory unit) public view returns (uint256) {
+        return supply[unit];
+    }
+
+    function getInfo(uint256 _tokenId) public view returns (string memory) {
+        return tokens[_tokenId].information;
+    }
+
+    function getQuota(uint256 _tokenId) public view returns (uint256) {
+        return tokens[_tokenId].quota;
+    }
+
+    function getUnit(uint256 _tokenId) public view returns (string memory) {
+        return tokens[_tokenId].unit;
     }
 }
