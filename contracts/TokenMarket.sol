@@ -6,6 +6,7 @@ contract TokenMarket {
     HackToken tokenContract;
     mapping(uint256 => uint256) listPrice;
     mapping(uint256 => uint256) listIndex;
+    mapping(uint256 => uint256) isListed;
     uint256 listNum = 0;
 
     uint[] listedToken;
@@ -35,7 +36,8 @@ contract TokenMarket {
 
    function remove(uint index) private returns(uint[] memory) {
         if (listedToken.length == 1) {
-            return listedToken.pop();
+            listedToken.pop();
+            return listedToken;
         }
 
         uint256 lastElement = listedToken[listedToken.length - 1];
