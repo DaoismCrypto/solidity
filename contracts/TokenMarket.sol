@@ -6,6 +6,7 @@ contract TokenMarket {
     HackToken tokenContract;
     mapping(uint256 => uint256) listPrice;
     mapping(uint256 => uint256) listIndex;
+    mapping(uint256 => uint256) isListed;
     uint256 listNum = 0;
 
     uint[] listedToken;
@@ -35,7 +36,8 @@ contract TokenMarket {
 
    function remove(uint index) private returns(uint[] memory) {
         if (listedToken.length == 1) {
-            return listedToken.pop();
+            listedToken.pop();
+            return listedToken;
         }
 
         uint256 lastElement = listedToken[listedToken.length - 1];
@@ -49,8 +51,8 @@ contract TokenMarket {
 
     function unlist(uint256 id) public preOwnerOnly(id) {
         require(listPrice[id] == 0, "Token is not listed");
-        listIndex[id] = 0;
         listedToken = remove(listIndex[id]);
+        listIndex[id] = 0;
         listNum -= 1;
         listPrice[id] = 0;
     }
@@ -88,5 +90,9 @@ contract TokenMarket {
 
     function getAllListedToken() public view returns (uint[] memory) {
         return listedToken;
+    }
+
+    function getToken(uint256 _tokenId) public view returns (string memory, string memory, string memory, string memory, uint256, uint256, address) {
+        return tokenContract.getTokenWithOwner(_tokenId);
     }
 }
