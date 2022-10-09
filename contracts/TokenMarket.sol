@@ -58,7 +58,7 @@ contract TokenMarket {
 
     function buyToken(uint256 id) public payable {
         require(listPrice[id] != 0, "Invalid token id");
-        require(msg.value >= listPrice[id]);
+        require(msg.value >= listPrice[id], "Not Enough Value to Buy");
 
         address recipient = tokenContract.getPrevOwner(id);
         payable(recipient).transfer(msg.value);
