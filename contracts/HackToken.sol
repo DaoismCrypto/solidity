@@ -62,7 +62,7 @@ contract HackToken is ERC721 {
             block.timestamp,
             address(0)
         );
-        supply[_unit] += _quota;
+        supply[_name] += _quota;
         tokens[_newTokenId] = newToken;
         emit mintToken(_to, _serialNumber, _quota);
     }
@@ -81,8 +81,8 @@ contract HackToken is ERC721 {
         return tokens[_tokenId].prevOwner;
     }
 
-    function getSupply(string memory unit) public view returns (uint256) {
-        return supply[unit];
+    function getSupply(string memory _name) public view returns (uint256) {
+        return supply[_name];
     }
 
     function getInfo(uint256 _tokenId) public view returns (string memory) {

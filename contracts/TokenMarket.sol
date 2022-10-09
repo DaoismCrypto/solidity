@@ -5,6 +5,10 @@ import "./HackToken.sol";
 contract TokenMarket {
     HackToken tokenContract;
     mapping(uint256 => uint256) listPrice;
+    mapping(uint256 => uint256) isListed;
+    uint256 listNum = 0;
+
+    uint[] listedToken;
 
     constructor(HackToken tokenAddress) {
         tokenContract = tokenAddress;
@@ -19,19 +23,36 @@ contract TokenMarket {
     }
 
     function list(uint256 id, uint256 price) public preOwnerOnly(id) {
+        listedToken.push(id);
+        isListed[id] = listNum;
         listPrice[id] = price;
+        listNum += 1;
     }
 
     function changePrice(uint256 id, uint256 price) public preOwnerOnly(id) {
         listPrice[id] = price;
     }
 
+   function remove(uint index) private returns(uint[] memory) {
+        uint256 lastElement = listedToken[listedToken.length - 1];
+
+        isListed[lastElement] = index;
+        listedToken[index] = lastElement;
+        listedToken.pop();
+
+        return listedToken;
+    }
+
     function unlist(uint256 id) public preOwnerOnly(id) {
+        isListed[id] = 0;
+        listedToken = remove(isListed[id]);
+        listNum -= 1;
         listPrice[id] = 0;
     }
 
     function transferBack(uint256 id) public preOwnerOnly(id) {
-        address preOwner = address(uint160(tokenContract.getPrevOwner(id)));
+        require(listPrice[id] == 0, "Token must be unlist first");
+        address preOwner = tokenContract.getPrevOwner(id);
         tokenContract.transferFrom(address(this), preOwner, id);
     }
 
@@ -39,7 +60,7 @@ contract TokenMarket {
         require(listPrice[id] != 0, "Invalid token id");
         require(msg.value >= listPrice[id]);
 
-        address recipient = address(uint160(tokenContract.getPrevOwner(id)));
+        address recipient = tokenContract.getPrevOwner(id);
         payable(recipient).transfer(msg.value);
         tokenContract.transferFrom(address(this), msg.sender, id);
     }
@@ -58,5 +79,9 @@ contract TokenMarket {
 
     function getQuota(uint256 id) public view returns (uint256) {
         return tokenContract.getQuota(id);
+    }
+
+    function getAllListedToken() public view returns (uint[] memory) {
+        return listedToken;
     }
 }

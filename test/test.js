@@ -93,6 +93,16 @@ contract('TokenMarket', function (accounts) {
         );
     });
 
+    it("Check listed Token", async () => {
+        let tokens = await tokenMarketInstance.getAllListedToken();
+
+        assert.notStrictEqual(
+            tokens,
+            undefined,
+            "Failed to check listed token"
+        );
+    })
+
     it("Check Unit in market", async () => {
         let unit = await tokenMarketInstance.getUnit(2);
 
@@ -131,5 +141,4 @@ contract('TokenMarket', function (accounts) {
             tokenMarketInstance.buyToken(2, { from: accounts[2], value: 1000000000000000000 })
         );
     })
-
 });
