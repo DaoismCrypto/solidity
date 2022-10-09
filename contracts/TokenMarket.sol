@@ -5,7 +5,7 @@ import "./HackToken.sol";
 contract TokenMarket {
     HackToken tokenContract;
     mapping(uint256 => uint256) listPrice;
-    mapping(uint256 => uint256) isListed;
+    mapping(uint256 => uint256) listIndex;
     uint256 listNum = 0;
 
     uint[] listedToken;
@@ -34,9 +34,13 @@ contract TokenMarket {
     }
 
    function remove(uint index) private returns(uint[] memory) {
+        if (listedToken.length == 1) {
+            return listedToken.pop();
+        }
+
         uint256 lastElement = listedToken[listedToken.length - 1];
 
-        isListed[lastElement] = index;
+        listIndex[lastElement] = index;
         listedToken[index] = lastElement;
         listedToken.pop();
 
@@ -44,8 +48,9 @@ contract TokenMarket {
     }
 
     function unlist(uint256 id) public preOwnerOnly(id) {
-        isListed[id] = 0;
-        listedToken = remove(isListed[id]);
+        require(listPrice[id] == 0, "Token is not listed");
+        listIndex[id] = 0;
+        listedToken = remove(listIndex[id]);
         listNum -= 1;
         listPrice[id] = 0;
     }
