@@ -119,6 +119,7 @@ contract HackToken is ERC721 {
         return (tokens[_tokenId].serialNumber, tokens[_tokenId].name, tokens[_tokenId].information, tokens[_tokenId].unit, tokens[_tokenId].quota, tokens[_tokenId].time, tokens[_tokenId].prevOwner);
     }
 
+
     function getTokenWithOwner(uint256 _tokenId) public view returns (string memory, string memory, string memory, string memory, uint256, uint256, address) {
         return (tokens[_tokenId].serialNumber, tokens[_tokenId].name, tokens[_tokenId].information, tokens[_tokenId].unit, tokens[_tokenId].quota, tokens[_tokenId].time, ownerOf(_tokenId));
     }
